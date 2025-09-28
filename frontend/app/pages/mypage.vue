@@ -1,20 +1,13 @@
-<script setup lang="ts">
-definePageMeta({
-    middleware: ["auth"],
-});
-
-const user = useAuthUser();
-</script>
+<script setup lang="ts"></script>
 
 <template>
     <main class="flex-grow bg-gray-100">
         <div class="py-20 px-6">
             <!-- プロフィールカード -->
             <div class="bg-white rounded-lg shadow p-6 flex items-center gap-6 mb-10">
-                <img :src="user.avatar" alt="avatar" class="w-24 h-24 rounded-full object-cover" />
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-800">{{ user?.displayname }}<span class="text-base text-gray-600">さん、ログインありがとうございます</span></h2>
-                    <p class="text-gray-600">{{ user?.email }}</p>
+                    <!--  <h2 class="text-2xl font-bold text-gray-800">{{ user?.displayname }}<span class="text-base text-gray-600">さん、ログインありがとうございます</span></h2>
+                    <p class="text-gray-600">{{ user?.email }}</p> -->
                 </div>
             </div>
 

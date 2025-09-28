@@ -11,5 +11,3 @@ export const useFlashMessage = () => {
 
     return { message, setMessage, clearMessage }
 }
-
-export const useAuthUser = () => useState<any | null>("auth-user", () => null)

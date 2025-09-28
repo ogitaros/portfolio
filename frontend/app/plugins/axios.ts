@@ -8,7 +8,7 @@ export default defineNuxtPlugin(() => {
     });
 
     // アクセストークンの保存
-    const accessToken = ref<string | null>(null);
+    const accessToken = useState<string | null>('accessToken', () => null);
 
     const router = useRouter();
 
@@ -28,7 +28,7 @@ export default defineNuxtPlugin(() => {
                 try {
                     const res = await api.post('/api/refresh')
                     accessToken.value = res.data.accessToken
-                    error.config.headers.Authorization = `Bearer ${accessToken}`
+                    error.config.headers.Authorization = `Bearer ${accessToken.value}`
                     return api.request(error.config)
                 } catch (e) {
                     console.log(e);
@@ -50,12 +50,12 @@ export default defineNuxtPlugin(() => {
             const res = await api.post('/api/login', { email: email, password: password });
             accessToken.value = res.data.accessToken;
             console.log("accessToken" + accessToken.value);
+            router.push("/mypage");
         } catch (e) {
             console.log(e);
             alert("ログイン失敗");
         }
     }
-
 
     const { setMessage } = useFlashMessage()
 
