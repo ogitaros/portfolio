@@ -13,10 +13,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Set up Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22.12.0'
 
       - name: Cache node modules
         uses: actions/cache@v3
@@ -47,6 +47,8 @@ jobs:
         run: |
           export PATH=$PATH:~/.local/bin
           cd frontend
+          
+          # バージョンラベルにコミットIDを使用
           VERSION_LABEL="frontend-${GITHUB_SHA}"
           echo "Deploying version: $VERSION_LABEL"
 
