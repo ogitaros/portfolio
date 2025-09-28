@@ -1,0 +1,57 @@
+name: Deploy Backend to AWS EB
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Cache Maven repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ hashFiles('backend/pom.xml') }}
+          restore-keys: |
+            maven-
+
+      - name: Build with Maven
+        run: |
+          cd backend
+          mvn clean package -DskipTests
+
+      - name: Install AWS EB CLI
+        run: pip install awsebcli --upgrade --user
+
+      - name: Deploy to Elastic Beanstalk
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+        run: |
+          export PATH=$PATH:~/.local/bin
+          cd backend
+          
+          # バージョンラベルにコミットIDを使用
+          VERSION_LABEL="backend-${GITHUB_SHA}"
+          echo "Deploying version: $VERSION_LABEL"
+
+          # EB 初期化（最初だけ必要、設定済みならコメントアウト可）
+          eb init ${{ secrets.EB_APP_NAME_BACKEND }} --platform "Java 17 running on 64bit Amazon Linux 2" --region $AWS_REGION
+          eb use ${{ secrets.EB_ENV_NAME_BACKEND }}
+
+          # war ファイルを zip にまとめてデプロイ
+          zip deploy.zip target/*.war
+          eb deploy --staged --label "$VERSION_LABEL"
