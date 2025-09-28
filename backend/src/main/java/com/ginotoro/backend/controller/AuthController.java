@@ -46,9 +46,6 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<?> register(@RequestBody RegisterUserDto req) {
 
-        System.out.println(
-                "displayname=" + req.getDisplayname() + ", email=" + req.getEmail() + ", password="
-                        + req.getPassword());
         authService.signup(req);
 
         return ResponseEntity.ok(Map.of("accessToken", ""));
@@ -56,8 +53,6 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginUserDto req, HttpServletResponse response) {
-
-        System.out.println("username=" + req.getEmail() + ", password=" + req.getPassword());
 
         try {
             authService.authenticate(req);

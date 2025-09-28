@@ -44,7 +44,7 @@ public class SecurityConfig {
 
         // 許可URI
         configuration.setAllowedOrigins(List.of("http://localhost:3000"));
-        configuration.setAllowedMethods(List.of("GET", "POST"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         // cookieの取得を許可
         configuration.setAllowCredentials(true);

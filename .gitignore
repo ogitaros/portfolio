@@ -1,7 +1,16 @@
-# common
+# ===============================
+# Root-level / shared
+# ===============================
+frontend/**/*.log
 HELP.md
+.DS_Store
+.idea/
+.vscode/
+*.iml
 
-# backend
+# ===============================
+# backend (Spring Boot)
+# ===============================
 backend/target/
 backend/.mvn/wrapper/maven-wrapper.jar
 
@@ -15,28 +24,27 @@ backend/springBeans
 backend/sts4-cache
 
 ### IntelliJ IDEA ###
-backend/**/.idea
 backend/**/*.iws
 backend/**/*.iml
 backend/**/*.ipr
 
 ### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
+backend/nbproject/private/
+backend/nbbuild/
+backend/dist/
+backend/nbdist/
+backend/.nb-gradle/
 build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### VS Code ###
-backend/.vscode/
 
 ### application ###
 backend/src/main/resources/*.properties
 
-# frontend
+# ===============================
+# frontend (Nuxt / Node)
+# ===============================
 ### Nuxt dev/build outputs ### 
 frontend/**/.output
 frontend/**/.data
@@ -50,12 +58,9 @@ frontend/node_modules
 
 # Logs
 frontend/logs
-frontend/**/*.log
 
 # Misc
-frontend/**/.DS_Store
 frontend/**/.fleet
-frontend/**/.idea
 
 # Local env files
 frontend/**/.env

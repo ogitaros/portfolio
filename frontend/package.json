@@ -5,7 +5,8 @@
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev --inspect",
-    "generate": "nuxt generate",
+    "generate": "nuxt generate && cpx \"dist/**/*\" ../src/main/resources/static",
+    "start": "node .output/server/index.mjs",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
   },
@@ -21,4 +22,5 @@
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.17"
   }
+
 }
