@@ -12,8 +12,6 @@ import com.ginotoro.backend.config.ApplicationProperties;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.io.Decoders;
 
 @Service
 public class JwtService {
