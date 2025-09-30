@@ -12,19 +12,19 @@ import com.ginotoro.backend.config.ApplicationProperties;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 
 @Service
 public class JwtService {
-    // 本番用
-    SecretKey SECRET_KEY = Jwts.SIG.HS256.key().build();
-    // HS256用のランダムキーを生成
-    // 検証中はわかりやすいように固定キーにしたいのでコメントアウト
-    // private static final byte[] keyBytes = Decoders.BASE64
-    // .decode("oginoShotaroBase64SecretStringOginoShotaroBase64SecretString");
-    // private static final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(keyBytes);
 
     @Autowired
     ApplicationProperties properties;
+
+    private SecretKey getSecretKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(properties.getSecretKey());
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
 
     /**
      * アクセストークンの生成
@@ -38,7 +38,7 @@ public class JwtService {
                 .subject(email)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + properties.getAccessExpiration()))
-                .signWith(SECRET_KEY)
+                .signWith(getSecretKey())
                 .compact();
 
         return accessToken;
@@ -57,7 +57,7 @@ public class JwtService {
                 .subject(email)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + properties.getRefreshExpiration()))
-                .signWith(SECRET_KEY)
+                .signWith(getSecretKey())
                 .compact();
 
         return refreshToken;
@@ -75,7 +75,7 @@ public class JwtService {
 
         try {
             Jwts.parser()
-                    .verifyWith(SECRET_KEY)
+                    .verifyWith(getSecretKey())
                     .build()
                     .parseSignedClaims(token);
             return true;
@@ -101,7 +101,7 @@ public class JwtService {
     public String getEmail(String token) {
         return Jwts
                 .parser()
-                .verifyWith(SECRET_KEY)
+                .verifyWith(getSecretKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()

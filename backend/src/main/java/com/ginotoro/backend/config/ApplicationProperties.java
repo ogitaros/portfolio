@@ -15,4 +15,7 @@ public class ApplicationProperties {
     @Value("${ginotoro.security.jwt.refresh-expiration}")
     private Long refreshExpiration;
 
+    @Value("${ginotoro.security.jwt.secret-key}")
+    private String secretKey;
+
 }

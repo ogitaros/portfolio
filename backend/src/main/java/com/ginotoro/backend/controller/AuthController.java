@@ -8,7 +8,6 @@ import com.ginotoro.backend.dto.AuthUserDto;
 import com.ginotoro.backend.dto.LoginUserDto;
 import com.ginotoro.backend.dto.RegisterUserDto;
 import com.ginotoro.backend.entity.UserM;
-import com.ginotoro.backend.entity.UserPassword;
 import com.ginotoro.backend.security.UserDetailsImpl;
 import com.ginotoro.backend.service.AuthService;
 import com.ginotoro.backend.service.JwtService;
@@ -22,6 +21,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -31,7 +33,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/api")
-// @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class AuthController {
 
     @Autowired
@@ -42,6 +43,9 @@ public class AuthController {
 
     @Autowired
     ApplicationProperties properties;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     @PostMapping("/signup")
     public ResponseEntity<?> register(@RequestBody RegisterUserDto req) {
@@ -55,9 +59,10 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody LoginUserDto req, HttpServletResponse response) {
 
         try {
-            authService.authenticate(req);
-
-            UserDetailsImpl user = new UserDetailsImpl(new UserM(), new UserPassword());
+            // 認証処理
+            Authentication authentication = (Authentication) authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword()));
+            UserDetailsImpl user = (UserDetailsImpl) authentication.getPrincipal();
             String accessToken = jwtService.generateAccessToken(user.getUsername());
             String refreshToken = jwtService.generateRefreshToken(user.getUsername());
 
@@ -65,6 +70,8 @@ public class AuthController {
             ResponseCookie cookie = ResponseCookie
                     .from("refreshToken", refreshToken)
                     .httpOnly(true)
+                    .secure(false) // dev環境なのでfalse、本番はtrue
+                    .sameSite("Lax") // dev環境なのでNone、本番は?
                     .path("/")
                     .maxAge(properties.getRefreshExpiration())
                     .build();
@@ -80,32 +87,56 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<?> refresh(@CookieValue("refreshToken") String refreshToken) {
+
         System.out.println("refreshメソッド：" + refreshToken);
-        if (jwtService.isTokenValid(refreshToken)) {
-
-            String email = jwtService.getEmail(refreshToken);
-
-            String newAccessToken = jwtService.generateAccessToken(email);
-            return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
+        if (refreshToken == null) {
+            System.out.println("refreshメソッド： No refresh token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No refresh token");
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        if (!jwtService.isTokenValid(refreshToken)) {
+            System.out.println("refreshメソッド： Invalid refresh token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
+        }
+
+        String email = jwtService.getEmail(refreshToken);
+        String newAccessToken = jwtService.generateAccessToken(email);
+        System.out.println("refreshメソッド newAccessToken： " + newAccessToken);
+
+        return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
+
     }
 
     @GetMapping("/user")
-    public ResponseEntity<?> user(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<?> user(@AuthenticationPrincipal UserDetails userDetails,
+            @CookieValue(value = "refreshToken", required = false) String refreshToken) {
+        boolean accessTokenExists = true;
+
         if (userDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+            if (refreshToken == null) {
+                System.out.println("userAPI： No refresh token");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No access / refresh token");
+            }
+            if (!jwtService.isTokenValid(refreshToken)) {
+                System.out.println("userAPI： Invalid refresh token");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No access token / Invalid refresh token");
+            }
+            accessTokenExists = false;
         }
         try {
+            UserM userInfo = new UserM();
+            if (accessTokenExists) {
+                userInfo = authService.getUserInfo(userDetails.getUsername());
+            } else {
+                userInfo = authService.getUserInfo(jwtService.getEmail(refreshToken));
+            }
+            AuthUserDto userDto = new AuthUserDto();
+            userDto.setEmail(userInfo.getEmail());
+            userDto.setDisplayname(userInfo.getDisplayName());
+            String newAccessToken = jwtService.generateAccessToken(userInfo.getEmail());
 
-            UserM userInfo = authService.getUserInfo(userDetails.getUsername());
-            AuthUserDto res = new AuthUserDto();
-            res.setEmail(userInfo.getEmail());
-            res.setDisplayname(userInfo.getDisplayName());
+            return ResponseEntity.ok(Map.of("user", userDto, "accessToken", newAccessToken));
 
-            return ResponseEntity.ok(res);
         } catch (Exception e) {
-
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 

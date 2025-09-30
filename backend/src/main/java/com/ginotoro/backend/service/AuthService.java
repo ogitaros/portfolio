@@ -16,18 +16,18 @@ import com.ginotoro.backend.repository.UserPasswordRepository;
 @Service
 public class AuthService {
 
-    private final UserMRepository userMRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
     @Autowired
     UserPasswordRepository userPasswordRepository;
 
+    @Autowired
+    UserMRepository userMRepository;
+
     public AuthService(
-            UserMRepository userMRepository,
             PasswordEncoder passwordEncoder,
             AuthenticationManager authenticationManager) {
-        this.userMRepository = userMRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
     }
@@ -48,7 +48,7 @@ public class AuthService {
 
     }
 
-    public UserM authenticate(LoginUserDto input) {
+    public UserM authenticateUserM(LoginUserDto input) {
         authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(input.getEmail(), input.getPassword()));
 

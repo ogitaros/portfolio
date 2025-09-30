@@ -41,6 +41,10 @@ const skillGroups = [
 const renderStars = (level: number) => {
     return "★★★★★☆☆☆☆☆".slice(5 - level, 10 - level);
 };
+
+const { message } = useFlashMessage();
+
+watch(message);
 </script>
 
 <template>
@@ -48,10 +52,10 @@ const renderStars = (level: number) => {
     <main class="flex-grow bg-gray-100">
         <!-- Message -->
         <transition name="fade">
-            <div v-if="message" class="bg-white pt-6 sm:pt-8 lg:pt-12">
+            <div v-if="message" class="pt-6 sm:pt-8 lg:pt-12">
                 <div class="mx-auto max-w-screen-2xl px-4 pb-4 md:px-8">
                     <div class="relative flex flex-wrap rounded-lg bg-indigo-500 px-4 py-3 shadow-lg sm:flex-nowrap sm:items-center sm:justify-center sm:gap-3 sm:pr-8 md:px-8">
-                        <div class="order-1 mb-2 inline-block w-11/12 max-w-screen-sm text-sm text-white sm:order-none sm:mb-0 sm:w-auto md:text-base">
+                        <div class="order-1 mb-2 inline-block w-11/12 max-w-screen-sm text-sm text-white sm:order-none sm:mb-0 sm:w-auto md:text-base font-bold">
                             {{ message }}
                         </div>
                     </div>

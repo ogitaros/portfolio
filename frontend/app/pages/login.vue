@@ -1,4 +1,6 @@
 <script setup lang="ts">
+middleware: ["guest-only"];
+
 const email = ref("");
 const password = ref("");
 const { $login } = useNuxtApp();
@@ -6,10 +8,23 @@ const { $login } = useNuxtApp();
 const doLogin = async () => {
     await $login(email.value, password.value);
 };
+const { message } = useFlashMessage();
 </script>
 
 <template>
     <div class="bg-gray-200 flex-1 justify-center">
+        <!-- Message -->
+        <transition name="fade">
+            <div v-if="message" class="pt-6 sm:pt-8 lg:pt-12">
+                <div class="mx-auto max-w-screen-2xl px-4 pb-4 md:px-8">
+                    <div class="relative flex flex-wrap rounded-lg bg-indigo-500 px-4 py-3 shadow-lg sm:flex-nowrap sm:items-center sm:justify-center sm:gap-3 sm:pr-8 md:px-8">
+                        <div class="order-1 mb-2 inline-block w-11/12 max-w-screen-sm text-sm text-white sm:order-none sm:mb-0 sm:w-auto md:text-base font-bold">
+                            {{ message }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </transition>
         <!-- ログインフォーム -->
         <form @submit.prevent="doLogin" class="mx-auto max-w-md rounded-lg border shadow bg-white justify-center mt-20">
             <div class="flex flex-col gap-6 p-6">
