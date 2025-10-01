@@ -10,7 +10,7 @@ const { user } = useUser();
                 <div>
                     <h2 class="text-2xl font-bold text-gray-800">
                         {{ user.displayname }}
-                        <span class="text-base text-gray-600"> さん、ログイン中。お忙しい中、ここまでご参照ありがとうございます。 </span>
+                        <span class="text-base text-gray-600"> logged in! Thank you for reading this far despite your busy schedule!!! </span>
                     </h2>
                     <p class="text-gray-600">{{ user.email }}</p>
                 </div>
@@ -19,8 +19,8 @@ const { user } = useUser();
             <!-- ダッシュボード風カード -->
             <div class="grid gap-6 md:grid-cols-2">
                 <div class="bg-white rounded-lg shadow p-6">
-                    <h3 class="font-semibold mb-2">お知らせ</h3>
-                    <p class="text-gray-600 text-sm">現在システムメンテナンスは予定されていません。</p>
+                    <h3 class="font-semibold mb-2">Notice</h3>
+                    <p class="text-gray-600 text-sm">There is currently no system maintenance scheduled.</p>
                 </div>
             </div>
         </div>

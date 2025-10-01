@@ -3,7 +3,6 @@ package com.ginotoro.backend.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ginotoro.backend.config.ApplicationProperties;
 import com.ginotoro.backend.dto.AuthUserDto;
 import com.ginotoro.backend.dto.LoginUserDto;
 import com.ginotoro.backend.dto.RegisterUserDto;

@@ -26,10 +26,11 @@ const { message } = useFlashMessage();
                 </div>
             </div>
         </transition>
-        <!-- ログインフォーム -->
+
+        <!-- SignupForm -->
         <form @submit.prevent="doSignup" class="mx-auto max-w-md rounded-lg border shadow bg-white justify-center mt-20">
             <div class="flex flex-col gap-6 p-6">
-                <!-- ユーザ名 -->
+                <!-- displayname -->
                 <div>
                     <label for="text" class="mb-2 block text-sm font-medium text-gray-600"> displayName </label>
                     <input v-model="displayname" id="displayname" name="Displayname" type="text" placeholder="ginotoro" class="w-full rounded border bg-gray-50 px-3 py-2 text-gray-800 outline-none focus:ring-2 focus:ring-gray-400 transition" />
@@ -46,7 +47,7 @@ const { message } = useFlashMessage();
                     <label for="password" class="mb-2 block text-sm font-medium text-gray-600">Password</label>
                     <input v-model="password" id="password" name="password" type="password" placeholder="••••••••" class="w-full rounded border bg-gray-50 px-3 py-2 text-gray-800 outline-none focus:ring-2 focus:ring-gray-400 transition" />
                 </div>
-                <!-- 登録 -->
+
                 <button type="submit" class="block w-full rounded-lg bg-gray-700 px-6 py-3 text-white font-semibold transition hover:bg-gray-600 active:bg-gray-800">signup</button>
             </div>
         </form>

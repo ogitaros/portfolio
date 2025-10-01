@@ -102,7 +102,7 @@ watch(message);
                                     <span class="text-yellow-400 text-base font-mono">
                                         <span v-for="i in 5" :key="i"> <span v-if="i <= skill.level">★</span><span v-else>☆</span> </span>
                                     </span>
-                                    <!-- ツールチップ本体 -->
+
                                     <span v-if="skill.note" class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-max max-w-xs px-3 py-2 rounded bg-gray-800 text-white text-xs opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-10 shadow-lg">
                                         {{ skill.note }}
                                     </span>
