@@ -54,10 +54,6 @@ jobs:
           VERSION_LABEL="frontend-${GITHUB_SHA}"
           echo "Deploying version: $VERSION_LABEL"
 
-          # 初期化（最初だけ必要）
-          eb init ${{ secrets.EB_APP_NAME_FRONTEND }} --platform "Node.js 18 running on 64bit Amazon Linux 2" --region $AWS_REGION
-          eb use ${{ secrets.EB_ENV_NAME_FRONTEND }}
-
           # SSR 実行に必要なファイルをまとめて zip 化
           zip -r deploy.zip .output package.json package-lock.json Procfile
           eb deploy --staged --label "$VERSION_LABEL"
