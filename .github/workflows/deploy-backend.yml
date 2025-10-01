@@ -50,10 +50,6 @@ jobs:
           VERSION_LABEL="backend-${GITHUB_SHA}"
           echo "Deploying version: $VERSION_LABEL"
 
-          # EB 初期化
-          eb init ${{ secrets.EB_APP_NAME_BACKEND }} --platform "Java 17 running on 64bit Amazon Linux 2" --region $AWS_REGION
-          eb use ${{ secrets.EB_ENV_NAME_BACKEND }}
-
           # war ファイルを zip にまとめてデプロイ
           zip deploy.zip target/*.war
           eb deploy --staged --label "$VERSION_LABEL"
