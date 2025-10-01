@@ -10,50 +10,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Set up Node.js 22
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22.12.0'
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
 
-      - name: Cache node modules
-        uses: actions/cache@v3
-        with:
-          path: frontend/node_modules
-          key: node-${{ hashFiles('frontend/package-lock.json') }}
-          restore-keys: |
-            node-
+    - name: Install dependencies
+      run: |
+        cd frontend
+        npm ci
+    - name: Build Nuxt
+      run: |
+        cd frontend
+        npm run build
 
-      - name: Install dependencies
-        run: |
-          cd frontend
-          npm ci
+    - name: Package frontend
+      run: |
+        cd frontend
+        zip -r ../frontend.zip .output package.json package-lock.json Procfile
 
-      - name: Build Nuxt app
-        run: |
-          cd frontend
-          npm run build
-
-      - name: Install AWS EB CLI
-        run: pip install awsebcli --upgrade --user
-
-      - name: Deploy to Elastic Beanstalk
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          APPLICATION_NAME: Portfolio-frontend
-          ENVIRONMENT_NAME: Portfolio-frontend-prod
-        run: |
-          export PATH=$PATH:~/.local/bin
-          cd frontend
-          
-          # バージョンラベルにコミットIDを使用
-          VERSION_LABEL="frontend-${GITHUB_SHA}"
-          echo "Deploying version: $VERSION_LABEL"
-
-          # SSR 実行に必要なファイルをまとめて zip 化
-          zip -r deploy.zip .output package.json package-lock.json Procfile
-          eb deploy --staged --label "$VERSION_LABEL"
+    - name: Deploy to EB
+      uses: einaregilsson/beanstalk-deploy@v22
+      with:
+        aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        application_name: portfolio-frontend
+        environment_name: portfolio-frontend-env
+        version_label: frontend-${{ github.sha }}
+        region: ap-northeast-1
+        deployment_package: frontend.zip
