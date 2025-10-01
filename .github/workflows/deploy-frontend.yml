@@ -37,8 +37,8 @@ jobs:
       with:
         aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        application_name: portfolio-frontend
-        environment_name: portfolio-frontend-env
+        application_name: Portfolio-frontend
+        environment_name: Portfolio-frontend-prod
         version_label: frontend-${{ github.sha }}
         region: ap-northeast-1
         deployment_package: frontend.zip
