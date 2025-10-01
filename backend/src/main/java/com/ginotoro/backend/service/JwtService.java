@@ -5,15 +5,16 @@ import java.util.Date;
 import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
 import com.ginotoro.backend.config.ApplicationProperties;
 
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Service
 public class JwtService {
@@ -45,6 +46,20 @@ public class JwtService {
 
     }
 
+    public void setRefreshToken(String email, HttpServletResponse res) {
+        String refreshToken = generateRefreshToken(email);
+        // Refrese Tokenを Cookieに保存(httpOnly)
+        ResponseCookie cookie = ResponseCookie
+                .from("refreshToken", refreshToken)
+                .httpOnly(true)
+                .secure(Boolean.valueOf(properties.getCookieSecure()))
+                .sameSite(properties.getCookieSameSite())
+                .path("/")
+                .maxAge(properties.getRefreshExpiration())
+                .build();
+        res.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
+
     /**
      * リフレッシュトークン生成
      *
@@ -61,35 +76,6 @@ public class JwtService {
                 .compact();
 
         return refreshToken;
-    }
-
-    /**
-     * 有効なトークンか
-     * DBアクセスは、冗長かつパフォーマンスロス発生する恐れあり
-     * 7日内であれば、ユーザステータス変更に伴うログイン拒否も不要と判断
-     *
-     * @param token
-     * @return 有効か
-     */
-    public boolean isTokenValid(String token) {
-
-        try {
-            Jwts.parser()
-                    .verifyWith(getSecretKey())
-                    .build()
-                    .parseSignedClaims(token);
-            return true;
-        } catch (ExpiredJwtException e) {
-            // 期限切れ
-            System.out.println(e);
-            System.out.println(e.getClass().getSimpleName());
-            return false;
-        } catch (JwtException e) {
-            // 署名不正
-            System.out.println(e);
-            System.out.println(e.getClass().getSimpleName());
-            return false;
-        }
     }
 
     /**

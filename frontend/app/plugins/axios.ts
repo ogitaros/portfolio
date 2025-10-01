@@ -25,6 +25,7 @@ export default defineNuxtPlugin(() => {
     });
 
     // レスポンス401のときはリフレッシュ
+    // 基本アクセストークンは再作成のため不要
     // api.interceptors.response.use(
     //     (res) => res,
     //     async (error) => {

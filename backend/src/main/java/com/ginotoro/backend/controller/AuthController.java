@@ -12,16 +12,18 @@ import com.ginotoro.backend.security.UserDetailsImpl;
 import com.ginotoro.backend.service.AuthService;
 import com.ginotoro.backend.service.JwtService;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -49,14 +51,19 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> register(@RequestBody RegisterUserDto req) {
+        try {
+            authService.signup(req);
 
-        authService.signup(req);
-
-        return ResponseEntity.ok(Map.of("accessToken", ""));
+            return ResponseEntity.ok(Map.of("accessToken", ""));
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Signup failed"));
+        }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginUserDto req, HttpServletResponse response) {
+    public ResponseEntity<?> login(@RequestBody LoginUserDto req, HttpServletResponse res) {
 
         try {
             // 認証処理
@@ -64,45 +71,45 @@ public class AuthController {
                     new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword()));
             UserDetailsImpl user = (UserDetailsImpl) authentication.getPrincipal();
             String accessToken = jwtService.generateAccessToken(user.getUsername());
-            String refreshToken = jwtService.generateRefreshToken(user.getUsername());
 
-            // Refrese Tokenを Cookieに保存(httpOnly)
-            ResponseCookie cookie = ResponseCookie
-                    .from("refreshToken", refreshToken)
-                    .httpOnly(true)
-                    .secure(false) // dev環境なのでfalse、本番はtrue
-                    .sameSite("Lax") // dev環境なのでNone、本番は?
-                    .path("/")
-                    .maxAge(properties.getRefreshExpiration())
-                    .build();
-            response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+            jwtService.setRefreshToken(user.getUsername(), res);
 
             return ResponseEntity.ok(Map.of("accessToken", accessToken));
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Invalid email or password"));
         } catch (Exception e) {
-
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Login failed"));
         }
 
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refresh(@CookieValue("refreshToken") String refreshToken) {
-
-        System.out.println("refreshメソッド：" + refreshToken);
+    public ResponseEntity<?> refresh(
+            @CookieValue(value = "refreshToken", required = false) String refreshToken) {
         if (refreshToken == null) {
-            System.out.println("refreshメソッド： No refresh token");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No refresh token");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "refreshAPI : No refresh token"));
         }
-        if (!jwtService.isTokenValid(refreshToken)) {
-            System.out.println("refreshメソッド： Invalid refresh token");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
+        try {
+
+            String email = jwtService.getEmail(refreshToken);
+            String newAccessToken = jwtService.generateAccessToken(email);
+            System.out.println("refreshメソッド newAccessToken： " + newAccessToken);
+
+            return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
+
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "refreshAPI : Access token expired"));
+        } catch (JwtException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "refreshAPI : Invalid refresh token"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "refreshAPI : Server error"));
         }
-
-        String email = jwtService.getEmail(refreshToken);
-        String newAccessToken = jwtService.generateAccessToken(email);
-        System.out.println("refreshメソッド newAccessToken： " + newAccessToken);
-
-        return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
 
     }
 
@@ -113,15 +120,12 @@ public class AuthController {
 
         if (userDetails == null) {
             if (refreshToken == null) {
-                System.out.println("userAPI： No refresh token");
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No access / refresh token");
-            }
-            if (!jwtService.isTokenValid(refreshToken)) {
-                System.out.println("userAPI： Invalid refresh token");
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No access token / Invalid refresh token");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("error", "userAPI : No refresh token"));
             }
             accessTokenExists = false;
         }
+
         try {
             UserM userInfo = new UserM();
             if (accessTokenExists) {
@@ -136,8 +140,15 @@ public class AuthController {
 
             return ResponseEntity.ok(Map.of("user", userDto, "accessToken", newAccessToken));
 
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "userAPI ：Access token expired"));
+        } catch (JwtException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "userAPI ：Invalid refresh token"));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "userAPI ：Server error"));
         }
 
     }

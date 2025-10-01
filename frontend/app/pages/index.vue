@@ -26,7 +26,7 @@ const skillGroups = [
         ],
     },
     {
-        title: "その他",
+        title: "Others",
         skills: [
             { name: "Linux", years: 6, level: 4, icon: "devicon-linux-plain colored", note: "サーバ構築・運用" },
             { name: "Docker", years: 3, level: 3, icon: "devicon-docker-plain colored", note: "コンテナ技術を利用したチーム開発や個人開発経験あり" },

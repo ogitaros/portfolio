@@ -18,4 +18,9 @@ public class ApplicationProperties {
     @Value("${ginotoro.security.jwt.secret-key}")
     private String secretKey;
 
+    @Value("${ginotoro.security.cookie.sameSite}")
+    private String cookieSameSite;
+
+    @Value("${ginotoro.security.cookie.secure}")
+    private String cookieSecure;
 }
