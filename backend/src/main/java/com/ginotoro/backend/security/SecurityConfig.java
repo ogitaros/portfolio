@@ -15,6 +15,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.ginotoro.backend.config.ApplicationProperties;
+
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
@@ -22,14 +24,17 @@ public class SecurityConfig {
     private final AuthenticationProvider authenticationProvider;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final UserDetailsService userDetailsService;
+    private final ApplicationProperties properties;
 
     public SecurityConfig(
             AuthenticationProvider authenticationProvider,
             JwtAuthenticationFilter jwtAuthenticationFilter,
-            UserDetailsService userDetailsService) {
+            UserDetailsService userDetailsService,
+            ApplicationProperties properties) {
         this.authenticationProvider = authenticationProvider;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.userDetailsService = userDetailsService;
+        this.properties = properties;
     }
 
     @Bean
@@ -38,7 +43,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/signup", "/api/login", "/api/refresh", "/api/mypage").permitAll()
+                        .requestMatchers("/api/signup", "/api/login", "/api/refresh").permitAll()
                         .anyRequest().authenticated())
                 .userDetailsService(userDetailsService)
                 .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -52,9 +57,13 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         // 許可URI
-        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+        configuration.setAllowedOrigins(List.of(properties.getUri()));
         configuration.setAllowedMethods(List.of("GET", "POST", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With"));// X-Requested-Withは、ローカルのみ必要
+        if (properties.getEnvironment().equals("prod")) {
+            configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "Origin"));
+        } else {
+            configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With"));
+        }
         // cookieの取得を許可
         configuration.setAllowCredentials(true);
 

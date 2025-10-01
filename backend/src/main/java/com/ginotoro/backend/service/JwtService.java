@@ -2,8 +2,6 @@ package com.ginotoro.backend.service;
 
 import java.util.Date;
 
-import javax.crypto.SecretKey;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -12,8 +10,6 @@ import org.springframework.stereotype.Service;
 import com.ginotoro.backend.config.ApplicationProperties;
 
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Service
@@ -22,16 +18,11 @@ public class JwtService {
     @Autowired
     ApplicationProperties properties;
 
-    private SecretKey getSecretKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(properties.getSecretKey());
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
-
     /**
-     * アクセストークンの生成
+     * アクセストークンを生成
      *
-     * @param username
-     * @return アクセストークン
+     * @param email
+     * @return accessToken
      */
     public String generateAccessToken(String email) {
         String accessToken = Jwts
@@ -39,20 +30,26 @@ public class JwtService {
                 .subject(email)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + properties.getAccessExpiration()))
-                .signWith(getSecretKey())
+                .signWith(properties.getSecretKey())
                 .compact();
 
         return accessToken;
 
     }
 
+    /**
+     * HttpOnly Cookieへセットする
+     *
+     * @param email
+     * @param res
+     */
     public void setRefreshToken(String email, HttpServletResponse res) {
         String refreshToken = generateRefreshToken(email);
         // Refrese Tokenを Cookieに保存(httpOnly)
         ResponseCookie cookie = ResponseCookie
                 .from("refreshToken", refreshToken)
                 .httpOnly(true)
-                .secure(Boolean.valueOf(properties.getCookieSecure()))
+                .secure(properties.getCookieSecure())
                 .sameSite(properties.getCookieSameSite())
                 .path("/")
                 .maxAge(properties.getRefreshExpiration())
@@ -61,10 +58,28 @@ public class JwtService {
     }
 
     /**
+     * refreshToken を削除
+     * Cookieの有効期限0に変更
+     * 
+     * @param email
+     * @param res
+     */
+    public void clearRefreshToken(HttpServletResponse res) {
+        // Refrese Tokenを Cookieに保存(httpOnly)
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .path("/")
+                .maxAge(0)
+                .build();
+
+        res.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
+
+    /**
      * リフレッシュトークン生成
      *
-     * @param username
-     * @return リフレッシュトークン
+     * @param email
+     * @return refreshToken
      */
     public String generateRefreshToken(String email) {
         String refreshToken = Jwts
@@ -72,22 +87,22 @@ public class JwtService {
                 .subject(email)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + properties.getRefreshExpiration()))
-                .signWith(getSecretKey())
+                .signWith(properties.getSecretKey())
                 .compact();
 
         return refreshToken;
     }
 
     /**
-     * メアド返却
+     * JWT からユーザーのメールアドレス (subject) を抽出
      *
      * @param token
-     * @return username
+     * @return email
      */
     public String getEmail(String token) {
         return Jwts
                 .parser()
-                .verifyWith(getSecretKey())
+                .verifyWith(properties.getSecretKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
