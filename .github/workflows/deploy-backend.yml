@@ -41,7 +41,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
           APPLICATION_NAME: portfolio-backend
-          ENVIRONMENT_NAME: portfolio-backend-prod
+          ENVIRONMENT_NAME: Portfolio-backend-prod
         run: |
           export PATH=$PATH:~/.local/bin
           cd backend
