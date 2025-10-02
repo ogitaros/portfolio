@@ -1,4 +1,14 @@
 <script setup lang="ts">
+useHead({
+    title: "ホーム",
+    meta: [
+        { name: "description", content: "Ginotoroのホームページ。最新のプロジェクトやスキル紹介" },
+        { property: "og:title", content: "Ginotoro Portfolio - ホーム" },
+        { property: "og:description", content: "Ginotoroのポートフォリオサイト" },
+        { property: "og:url", content: "https://ginotoro-portfolio.jp/" },
+        { property: "og:image", content: "https://ginotoro-portfolio.jp/ogp/home.webp" },
+    ],
+});
 const skillGroups = [
     {
         title: "Frontend",

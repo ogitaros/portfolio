@@ -1,6 +1,17 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from "vue";
 
+useHead({
+    title: "愛しのチュータカレンダー",
+    meta: [
+        { name: "description", content: "Ginotoroのホームページ。愛犬チュータのカレンダー" },
+        { property: "og:title", content: "チュータカレンダー" },
+        { property: "og:description", content: "愛犬チュータのカレンダー" },
+        { property: "og:url", content: "https://ginotoro-portfolio.jp/" },
+        { property: "og:image", content: "https://ginotoro-portfolio.jp/ogp/chuta.webp" },
+    ],
+});
+
 // 今日の年を初期値に
 const year = ref(new Date().getFullYear());
 

@@ -1,4 +1,7 @@
 <script setup lang="ts">
+useHead({
+    meta: [{ name: "robots", content: "noindex, nofollow" }],
+});
 middleware: ["guest-only"];
 const displayname = ref("");
 const email = ref("");

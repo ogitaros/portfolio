@@ -1,4 +1,7 @@
 <script setup>
+useHead({
+    meta: [{ name: "robots", content: "noindex, nofollow" }],
+});
 const { user } = useUser();
 </script>
 
