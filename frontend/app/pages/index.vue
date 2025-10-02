@@ -1,13 +1,15 @@
 <script setup lang="ts">
 useHead({
-    title: "ホーム",
+    title: "Ginotoro Portfolio | ソフトウェアエンジニアの作品集",
     meta: [
-        { name: "description", content: "Ginotoroのホームページ。最新のプロジェクトやスキル紹介" },
-        { property: "og:title", content: "Ginotoro Portfolio - ホーム" },
-        { property: "og:description", content: "Ginotoroのポートフォリオサイト" },
-        { property: "og:url", content: "https://ginotoro-portfolio.jp/" },
+        { name: "description", content: "Spring Boot × Nuxt3 × AWS を用いたソフトウェア開発ポートフォリオ。DB設計からCI/CDまで一貫して実装。" },
+        { property: "og:title", content: "Ginotoro Portfolio" },
+        { property: "og:description", content: "Spring Boot × Nuxt3 × AWS を用いたソフトウェア開発ポートフォリオ。" },
         { property: "og:image", content: "https://ginotoro-portfolio.jp/ogp/home.webp" },
+        { property: "og:url", content: "https://ginotoro-portfolio.jp/" },
+        { name: "twitter:card", content: "summary_large_image" },
     ],
+    link: [{ rel: "canonical", href: "https://ginotoro-portfolio.jp/" }],
 });
 const skillGroups = [
     {

@@ -3,6 +3,9 @@ export default defineNuxtConfig({
 
   compatibilityDate: '2025-07-15',
 
+  modules: ["@nuxtjs/tailwindcss", '@nuxtjs/sitemap'],
+
+
   app: {
     head: {
       titleTemplate: '%s | Ginotoro Portfolio',
@@ -18,9 +21,15 @@ export default defineNuxtConfig({
     },
   },
 
+  sitemap: {
+    hostname: process.env.NODE_ENV === 'production'
+      ? 'https://ginotoro-portfolio.jp'
+      : 'http://localhost:8080',
+    exclude: ['/login', '/mypage', '/signup'],
+  },
+
   devtools: { enabled: true },
 
-  modules: ["@nuxtjs/tailwindcss"],
 
   postcss: {
     plugins: {

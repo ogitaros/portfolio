@@ -2,14 +2,16 @@
 import { ref, watch, onMounted } from "vue";
 
 useHead({
-    title: "愛しのチュータカレンダー",
+    title: "愛しのチュータカレンダー | Ginotoro Portfolio",
     meta: [
-        { name: "description", content: "Ginotoroのホームページ。愛犬チュータのカレンダー" },
-        { property: "og:title", content: "チュータカレンダー" },
-        { property: "og:description", content: "愛犬チュータのカレンダー" },
-        { property: "og:url", content: "https://ginotoro-portfolio.jp/" },
+        { name: "description", content: "Ginotoro オリジナルの「チュータカレンダー」。可愛いチュータと一緒に祝日などを確認できるカレンダー" },
+        { property: "og:title", content: "愛しのチュータカレンダー | Ginotoro Portfolio" },
+        { property: "og:description", content: "Ginotoro のオリジナル「チュータカレンダー」。毎月の予定を可愛いチュータと一緒にチェックできます。" },
         { property: "og:image", content: "https://ginotoro-portfolio.jp/ogp/chuta.webp" },
+        { property: "og:url", content: "https://ginotoro-portfolio.jp/chuta" },
+        { name: "twitter:card", content: "summary_large_image" },
     ],
+    link: [{ rel: "canonical", href: "https://ginotoro-portfolio.jp/chuta" }],
 });
 
 // 今日の年を初期値に
