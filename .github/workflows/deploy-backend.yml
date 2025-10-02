@@ -24,9 +24,10 @@ jobs:
 
     # 3. ビルド (WAR)
     - name: Build with Maven
-      run: |
-        cd backend
-        mvn clean package -DskipTests
+      run: mvn -B package --file backend/pom.xml
+
+    - name: Check build output
+      run: ls -l backend/target
 
     # 4. WAR を zip 化
     - name: Package backend
