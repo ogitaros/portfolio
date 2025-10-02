@@ -43,7 +43,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/health").permitAll()
+                        .requestMatchers("/api/health", "/actuator/health", "/actuator/info").permitAll()
                         .requestMatchers("/api/signup", "/api/login", "/api/refresh").permitAll()
                         .anyRequest().authenticated())
                 .userDetailsService(userDetailsService)
