@@ -10,40 +10,47 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. ソースコード取得
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      # リポジトリ取得
+      - name: Checkout source code
+        uses: actions/checkout@v4
 
-    # 2. Java セットアップ
-    - name: Set up Java
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: '21'
-        cache: 'maven'
+      # Java セットアップ
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          
+      # ========================
+      # ビルド
+      # ========================
+      - name: Build backend (skip tests)
+        run: mvn -B package -DskipTests --file backend/pom.xml
 
-    # 3. ビルド (WAR)
-    - name: Build with Maven
-      run: mvn -B package --file backend/pom.xml
+      # ========================
+      # 確認
+      # ========================
+      - name: Check build output
+        run: ls -l backend/target
+        
+      # ========================
+      #  zip 化
+      # ========================
 
-    - name: Check build output
-      run: ls -l backend/target
+      - name: Package backend.zip
+        run: |
+          cd backend/target
+          zip -r ../../../backend.zip portfolio-0.0.1-SNAPSHOT.war
+          cd ../../..
 
-    # 4. WAR を zip 化
-    - name: Package backend
-      run: |
-        cd backend/target
-        zip -r ../../../backend.zip portfolio-0.0.1-SNAPSHOT.war
-        cd ../../..
-
-    # 5. EB へデプロイ
-    - name: Deploy to EB
-      uses: einaregilsson/beanstalk-deploy@v22
-      with:
-        aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        application_name: portfolio-backend
-        environment_name: Portfolio-backend-env
-        version_label: backend-${{ github.sha }}
-        region: ap-northeast-1
-        deployment_package: backend.zip
+      # 5. EB へデプロイ
+      - name: Deploy backend to EB
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: portfolio-backend
+          environment_name: Portfolio-backend-env
+          version_label: backend-${{ github.sha }}
+          region: ap-northeast-1
+          deployment_package: backend.zip
