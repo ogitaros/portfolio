@@ -40,7 +40,7 @@ jobs:
       - name: Package backend.zip
         run: |
           cd backend/target
-          zip -r ../../../backend.zip portfolio-0.0.1-SNAPSHOT.war
+          zip -r ../../../backend.zip backend-0.0.1-SNAPSHOT.war
           cd ../../..
 
       # 5. EB へデプロイ
