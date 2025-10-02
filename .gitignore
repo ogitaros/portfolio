@@ -40,7 +40,7 @@ build/
 
 
 ### application ###
-backend/src/main/resources/*.properties
+backend/src/main/resources/*dev.properties
 
 # ===============================
 # frontend (Nuxt / Node)
