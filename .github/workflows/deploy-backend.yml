@@ -34,14 +34,13 @@ jobs:
         run: ls -l backend/target
         
       # ========================
-      #  zip 化
+      # zip 化（war + Procfile）
       # ========================
-
       - name: Package backend.zip
         run: |
-          cd backend/target
-          zip -r ../../../backend.zip backend-0.0.1-SNAPSHOT.war
-          cd ../../..
+          cp backend/Procfile .
+          cp backend/target/backend-0.0.1-SNAPSHOT.war backend.war
+          zip -r backend.zip backend.war Procfile
 
       # 5. EB へデプロイ
       - name: Deploy backend to EB
