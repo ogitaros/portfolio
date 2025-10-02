@@ -10,7 +10,7 @@
 
             <!-- GitLab -->
             <a href="https://github.com/ogitaros" target="_blank">
-                <img src="/logos/gitlab-logo-700-rgb.png" alt="GitLab" class="h-7 pb-1 px-4 hover:opacity-50 transition" />
+                <img src="/logos/gitlab-logo-700-rgb.svg" alt="GitLab" class="h-7 pb-1 px-4 hover:opacity-50 transition" />
             </a>
 
             <!-- Qiita -->

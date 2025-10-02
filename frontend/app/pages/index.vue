@@ -121,7 +121,7 @@ watch(message);
                 <div class="mt-4 grid gap-6 xl:grid-cols-3 md:grid-cols-2">
                     <div class="bg-white rounded-lg shadow hover:shadow-md transition overflow-hidden">
                         <NuxtLink to="/login" target="_blank" class="block hover:bg-gray-50 transition">
-                            <img src="/login.png" alt="Work1" class="w-full h-40 object-cover" />
+                            <img src="/login.webp" alt="Work1" class="w-full h-40 object-cover" />
                             <div class="p-4">
                                 <h4 class="font-bold">JWT + Refresh Tokenを利用したログイン機能</h4>
                                 <p class="text-gray-600 text-sm mt-2">SSR(nuxt + spring-boot)を利用して作成<br />※コードは、フッターよりGitHub参照</p>
@@ -145,7 +145,7 @@ watch(message);
 
                     <div class="bg-white rounded-lg shadow hover:shadow-md transition overflow-hidden">
                         <NuxtLink to="/chuta" target="_blank" class="block hover:bg-gray-50 transition">
-                            <img src="/chuta/chuta.png" alt="Work1" class="w-full h-40 object-cover" />
+                            <img src="/chuta/chuta.webp" alt="Work1" class="w-full h-40 object-cover" />
                             <div class="p-4">
                                 <h4 class="font-bold">愛犬のカレンダー</h4>
                                 <p class="text-gray-600 text-sm mt-2">nuxt + tailwindcssで制作<br />※AI任せ</p>

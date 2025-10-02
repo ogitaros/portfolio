@@ -29,7 +29,7 @@ watch(year, (newYear) => {
 });
 
 // 12か月分の画像（サンプル）
-const images = ["/chuta/jan.jpg", "/chuta/feb.jpg", "/chuta/mar.jpg", "/chuta/apr.jpg", "/chuta/may.jpg", "/chuta/jun.jpg", "/chuta/jul.jpg", "/chuta/aug.jpg", "/chuta/sep.jpg", "/chuta/oct.jpg", "/chuta/nov.jpg", "/chuta/dec.jpg"];
+const images = ["/chuta/jan.webp", "/chuta/feb.webp", "/chuta/mar.webp", "/chuta/apr.webp", "/chuta/may.webp", "/chuta/jun.webp", "/chuta/jul.webp", "/chuta/aug.webp", "/chuta/sep.webp", "/chuta/oct.webp", "/chuta/nov.webp", "/chuta/dec.webp"];
 
 // 月ごとに日数を返す関数
 const getDays = (month: number) => {
